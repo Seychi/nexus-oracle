@@ -6,6 +6,7 @@
     "dev": "npx tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "migrate": "prisma migrate deploy",
     "seed": "npx tsx src/workers/crawler.ts",
     "aggregate": "npx tsx src/workers/aggregator.ts",
     "ingest": "npx tsx src/workers/matchIngester.ts"
