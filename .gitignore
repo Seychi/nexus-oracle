@@ -1,6 +1,8 @@
 node_modules/
 .vite/
 out/
+dist/
 api.env
 *.env
 !.env.example
+.mcp.json

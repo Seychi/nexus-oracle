@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/buildcard.tsx","./src/components/championcard.tsx","./src/components/itemicon.tsx","./src/components/matchuprow.tsx","./src/components/tierbadge.tsx","./src/lib/api.ts","./src/lib/datadragon.tsx","./src/pages/championpage.tsx","./src/pages/summonerpage.tsx","./src/pages/tierlist.tsx"],"version":"5.9.3"}

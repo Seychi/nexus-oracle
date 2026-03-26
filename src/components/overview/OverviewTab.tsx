@@ -1,7 +1,35 @@
 import React from 'react';
 import { useStore } from '../../store/gameStore';
 import PlayerCard from '../shared/PlayerCard';
-import Markdown from 'react-markdown';
+
+function WinProbability() {
+  const { analysis } = useStore();
+  if (!analysis) return null;
+  const { probability, factors } = analysis.winPrediction;
+  const color = probability >= 60 ? 'text-lol-green' : probability <= 40 ? 'text-lol-enemy' : 'text-lol-gold';
+  const barColor = probability >= 60 ? 'bg-lol-green' : probability <= 40 ? 'bg-lol-enemy' : 'bg-lol-gold';
+
+  return (
+    <div className="px-2 py-1.5 bg-lol-card border-b border-white/[0.07]">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[9px] text-lol-dim uppercase tracking-widest">Win Probability</span>
+        <span className={`text-[13px] font-bold ${color}`}>{probability}%</span>
+      </div>
+      <div className="h-2 rounded-full bg-white/[0.07] overflow-hidden mb-1.5">
+        <div className={`h-full ${barColor} rounded-full transition-all duration-700`} style={{ width: `${probability}%` }} />
+      </div>
+      <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+        {factors.map((f) => (
+          <span key={f.name} className={`text-[8px] ${
+            f.impact === 'positive' ? 'text-lol-green' : f.impact === 'negative' ? 'text-lol-enemy' : 'text-lol-dim'
+          }`}>
+            {f.name}: {f.value}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function GoldBar() {
   const { analysis } = useStore();
@@ -29,6 +57,35 @@ function GoldBar() {
   );
 }
 
+function LaneStates() {
+  const { analysis } = useStore();
+  if (!analysis?.laneStates.length) return null;
+  const lanes = analysis.laneStates.filter((l) => l.ally || l.enemy);
+  if (lanes.length === 0) return null;
+
+  const diffColor = (d: number) => d > 0 ? 'text-lol-green' : d < 0 ? 'text-lol-enemy' : 'text-lol-dim';
+  const fmt = (d: number) => (d > 0 ? '+' : '') + d;
+
+  return (
+    <div className="px-2 py-1.5">
+      <div className="text-[9px] font-bold text-lol-gold uppercase tracking-widest mb-1">Lane Matchups</div>
+      <div className="flex flex-col gap-0.5">
+        {lanes.map((lane) => (
+          <div key={lane.position} className="flex items-center text-[9px] gap-1">
+            <span className="w-6 text-lol-dim font-bold">{lane.position}</span>
+            <span className="flex-1 text-lol-ally truncate">{lane.ally?.championName ?? '—'}</span>
+            <span className={`w-8 text-center font-bold ${diffColor(lane.csDiff)}`}>{fmt(lane.csDiff)}</span>
+            <span className="text-[7px] text-lol-dim w-4">CS</span>
+            <span className={`w-6 text-center font-bold ${diffColor(lane.levelDiff)}`}>{fmt(lane.levelDiff)}</span>
+            <span className="text-[7px] text-lol-dim w-4">Lv</span>
+            <span className="flex-1 text-lol-enemy truncate text-right">{lane.enemy?.championName ?? '—'}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function AlertFeed() {
   const { analysis } = useStore();
   if (!analysis?.alerts.length) return null;
@@ -51,57 +108,32 @@ function AlertFeed() {
   );
 }
 
-function ClaudePanel() {
-  const { analysis } = useStore();
-  if (!analysis) return null;
-
-  if (analysis.isAnalysing) return (
-    <div className="flex items-center gap-2 px-3 py-3 text-lol-dim text-xs">
-      <div className="w-4 h-4 border-2 border-lol-gold/30 border-t-lol-gold rounded-full animate-spin" />
-      Analysing with Claude…
-    </div>
-  );
-
-  if (!analysis.claudeAnalysis) return (
-    <div className="px-3 py-2 text-[10px] text-lol-dim text-center">
-      Press <span className="text-lol-gold">🧠 Analyse</span> for AI advice
-    </div>
-  );
-
-  return (
-    <div className="px-2 pb-2">
-      <div className="text-[9px] text-lol-gold font-bold uppercase tracking-widest mb-1 px-1">AI Insights</div>
-      <div className="text-[10px] text-lol-text leading-relaxed prose prose-invert max-w-none
-        [&_h3]:text-[10px] [&_h3]:font-bold [&_h3]:text-lol-gold [&_h3]:mt-2 [&_h3]:mb-0.5
-        [&_ul]:pl-3 [&_li]:mb-0.5 [&_strong]:text-white [&_p]:mb-1">
-        <Markdown>{analysis.claudeAnalysis}</Markdown>
-      </div>
-    </div>
-  );
-}
-
 export default function OverviewTab() {
   const { game } = useStore();
   if (!game) return null;
 
+  const allyKills  = game.allies.reduce((s, p) => s + p.kills, 0);
+  const enemyKills = game.enemies.reduce((s, p) => s + p.kills, 0);
+
   return (
     <div className="flex flex-col gap-0 overflow-y-auto">
+      <WinProbability />
       <GoldBar />
+      <LaneStates />
       <AlertFeed />
 
       {/* Teams side by side */}
       <div className="flex gap-1.5 px-2 py-1.5">
         <div className="flex-1 flex flex-col gap-1">
           <div className="text-[9px] font-bold text-lol-ally uppercase tracking-widest">Allies</div>
-          {game.allies.map((p) => <PlayerCard key={p.summonerName} player={p} accent="ally" />)}
+          {game.allies.map((p) => <PlayerCard key={p.summonerName} player={p} accent="ally" teamKills={allyKills} />)}
         </div>
         <div className="flex-1 flex flex-col gap-1">
           <div className="text-[9px] font-bold text-lol-enemy uppercase tracking-widest">Enemies</div>
-          {game.enemies.map((p) => <PlayerCard key={p.summonerName} player={p} accent="enemy" />)}
+          {game.enemies.map((p) => <PlayerCard key={p.summonerName} player={p} accent="enemy" teamKills={enemyKills} />)}
         </div>
       </div>
 
-      <ClaudePanel />
     </div>
   );
 }

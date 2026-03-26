@@ -26,14 +26,14 @@ function priority(score: number): ThreatPriority {
   return 'low';
 }
 
-export function rankThreats(enemies: Player[], selfStats: ChampionStats): ThreatEntry[] {
+export function rankThreats(enemies: Player[], selfStats: ChampionStats, selfLevel = 1): ThreatEntry[] {
   return enemies
     .map((p) => {
       const cls = getChampClass(p.championName);
       const classMultiplier = CLASS_THREAT[cls] ?? 1.5;
       const kda  = kdaScore(p);
       const items = itemScore(p);
-      const lvl  = levelScore(p, 1); // approximate self level; caller can pass real value
+      const lvl  = levelScore(p, selfLevel);
       const score = (kda * 4 + items + lvl) * classMultiplier;
 
       const reasons: string[] = [];

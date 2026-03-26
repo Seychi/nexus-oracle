@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-lol-dark text-lol-text font-sans antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0a0e14;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #2a3444;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a4a5c;
+  }
+
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #2a3444 #0a0e14;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-lol-gold text-lol-dark font-semibold px-4 py-2 rounded
+           hover:bg-lol-gold/90 transition-colors duration-150;
+  }
+
+  .card {
+    @apply bg-lol-card rounded-lg border border-white/5;
+  }
+
+  .stat-green {
+    @apply text-emerald-400;
+  }
+
+  .stat-red {
+    @apply text-red-400;
+  }
+
+  .stat-neutral {
+    @apply text-lol-text;
+  }
+}

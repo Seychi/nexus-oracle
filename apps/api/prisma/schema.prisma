@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Match {
+  id                 String        @id
+  queueId            Int
+  patch              String
+  gameDuration       Int
+  gameStartTimestamp BigInt
+  rawJson            Json
+  ingested           Boolean       @default(false)
+  createdAt          DateTime      @default(now())
+  participants       Participant[]
+}
+
+model Participant {
+  id             String  @id @default(cuid())
+  matchId        String
+  match          Match   @relation(fields: [matchId], references: [id])
+  puuid          String
+  summonerName   String
+  championId     Int
+  championName   String
+  teamPosition   String
+  win            Boolean
+  patch          String
+  queueId        Int
+  rankTier       String?
+  item0          Int     @default(0)
+  item1          Int     @default(0)
+  item2          Int     @default(0)
+  item3          Int     @default(0)
+  item4          Int     @default(0)
+  item5          Int     @default(0)
+  item6          Int     @default(0)
+  primaryRune    Int
+  secondaryRune  Int
+  perks          Json
+  summoner1Id    Int
+  summoner2Id    Int
+  skillOrder     Json
+  kills          Int
+  deaths         Int
+  assists        Int
+  totalDamageDealtToChampions Int
+  totalDamageTaken            Int
+  goldEarned     Int
+  totalMinionsKilled   Int
+  neutralMinionsKilled Int
+  visionScore    Int
+  wardsPlaced    Int
+  wardsKilled    Int
+  timePlayed     Int
+  createdAt      DateTime @default(now())
+
+  @@index([championId, teamPosition, patch, queueId])
+  @@index([puuid])
+  @@index([patch, queueId])
+}
+
+model ChampionStats {
+  id           String   @id @default(cuid())
+  championId   Int
+  championName String
+  role         String
+  patch        String
+  queueId      Int
+  rankFilter   String
+  games        Int
+  wins         Int
+  winRate      Float
+  pickRate     Float
+  banRate      Float
+  avgKills     Float
+  avgDeaths    Float
+  avgAssists   Float
+  avgDamage    Float
+  avgGold      Float
+  avgCs        Float
+  tier         String?
+  updatedAt    DateTime @updatedAt
+
+  @@unique([championId, role, patch, queueId, rankFilter])
+}
+
+model BuildStats {
+  id           String   @id @default(cuid())
+  championId   Int
+  championName String
+  role         String
+  patch        String
+  queueId      Int
+  buildType    String
+  items        Int[]
+  games        Int
+  wins         Int
+  winRate      Float
+  pickRate     Float
+  rank         Int
+  updatedAt    DateTime @updatedAt
+
+  @@index([championId, role, patch, queueId, buildType])
+}
+
+model MatchupStats {
+  id            String   @id @default(cuid())
+  championId    Int
+  opponentId    Int
+  role          String
+  patch         String
+  queueId       Int
+  games         Int
+  wins          Int
+  winRate       Float
+  avgGoldDiff15 Float
+  avgCsDiff15   Float
+  updatedAt     DateTime @updatedAt
+
+  @@unique([championId, opponentId, role, patch, queueId])
+}
+
+model CrawlSeed {
+  puuid       String   @id
+  region      String
+  tier        String
+  lastCrawled DateTime?
+  createdAt   DateTime @default(now())
+}

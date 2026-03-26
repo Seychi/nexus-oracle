@@ -1,11 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Player } from '../../types';
 import { DDImg, champUrl, itemUrl, spellUrl } from './ChampIcon';
 
-interface Props { player: Player; accent: 'ally' | 'enemy'; compact?: boolean; }
+interface Props { player: Player; accent: 'ally' | 'enemy'; compact?: boolean; teamKills?: number; }
 
-export default function PlayerCard({ player: p, accent, compact }: Props) {
+export default function PlayerCard({ player: p, accent, compact, teamKills }: Props) {
   const borderColor = p.isSelf ? 'border-l-lol-gold' : accent === 'ally' ? 'border-l-lol-ally' : 'border-l-lol-enemy';
+
+  // Live-ticking respawn countdown (interpolates between 1.5s polling intervals)
+  const [countdown, setCountdown] = useState(p.respawnTimer);
+  useEffect(() => {
+    setCountdown(p.respawnTimer);
+    if (!p.isDead || p.respawnTimer <= 0) return;
+    const start = Date.now();
+    const initial = p.respawnTimer;
+    const iv = setInterval(() => {
+      const remaining = Math.max(0, initial - (Date.now() - start) / 1000);
+      setCountdown(remaining);
+      if (remaining <= 0) clearInterval(iv);
+    }, 100);
+    return () => clearInterval(iv);
+  }, [p.isDead, p.respawnTimer]);
 
   return (
     <div className={`bg-lol-card border border-white/[0.07] border-l-2 ${borderColor} rounded p-1.5 flex flex-col gap-1 ${p.isDead ? 'opacity-40' : ''}`}>
@@ -16,13 +31,16 @@ export default function PlayerCard({ player: p, accent, compact }: Props) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1">
             <span className="text-2xs font-bold text-lol-text truncate">{p.championName}</span>
-            {p.isDead && <span className="text-[9px] text-lol-enemy">☠ {Math.ceil(p.respawnTimer)}s</span>}
+            {p.isDead && <span className="text-[9px] text-lol-enemy animate-pulse">{Math.ceil(countdown)}s</span>}
           </div>
           <div className="text-[9px] text-lol-dim truncate">{p.summonerName}</div>
           <div className="flex gap-1.5 mt-0.5 text-[9px]">
             <span className="text-lol-text">{p.kills}/{p.deaths}/{p.assists}</span>
             <span className="text-lol-dim">{p.cs}cs</span>
             <span className="text-lol-gold">Lv.{p.level}</span>
+            {teamKills != null && teamKills > 0 && (
+              <span className="text-lol-purple">{Math.round(((p.kills + p.assists) / teamKills) * 100)}%KP</span>
+            )}
           </div>
         </div>
 

@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: nexus-oracle-api
+    runtime: node
+    region: frankfurt
+    plan: free
+    buildCommand: cd apps/api && npm install && npx prisma generate && npm run build
+    startCommand: cd apps/api && npx prisma migrate deploy && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+      - key: RIOT_API_KEY
+        sync: false
+      - key: RIOT_REGIONAL_BASE
+        value: https://europe.api.riotgames.com
+      - key: RIOT_PLATFORM_BASE
+        value: https://euw1.api.riotgames.com
+      - key: TARGET_PATCH
+        value: "16.6"
+      - key: TARGET_REGION
+        value: euw1
+      - key: TARGET_QUEUE
+        value: "420"
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false

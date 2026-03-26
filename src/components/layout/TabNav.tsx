@@ -6,6 +6,7 @@ const TABS: { id: TabId; label: string; icon: string }[] = [
   { id: 'teamfight',  label: 'Teamfight',  icon: '⚔️' },
   { id: 'items',      label: 'Items',      icon: '🛒' },
   { id: 'macro',      label: 'Macro',      icon: '🗺️' },
+  { id: 'ai',         label: 'AI',         icon: '🧠' },
 ];
 
 export default function TabNav() {

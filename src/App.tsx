@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useStore } from './store/gameStore';
 import { normaliseGame } from './api/liveClient';
+import { buildPrompt } from './api/claudeAnalysis';
 import type { RawLiveData } from './types';
 import Header from './components/layout/Header';
 import TabNav from './components/layout/TabNav';
@@ -9,6 +10,8 @@ import OverviewTab from './components/overview/OverviewTab';
 import TeamfightTab from './components/teamfight/TeamfightTab';
 import ItemsTab from './components/items/ItemsTab';
 import MacroTab from './components/macro/MacroTab';
+import AiTab from './components/ai/AiTab';
+import ChampSelectView from './components/champselect/ChampSelectView';
 
 export default function App() {
   const { status, activeTab, setStatus, setGame, setClaudeAnalysis, setAnalysing } = useStore();
@@ -16,12 +19,17 @@ export default function App() {
 
   useEffect(() => {
     const api = window.electronAPI;
-    api.onStatus((s)    => setStatus(s as 'waiting' | 'in-game'));
+    api.onStatus((s) => setStatus(s as 'waiting' | 'in-game' | 'champ-select'));
     api.onGameData((raw) => {
       try { setGame(normaliseGame(raw as RawLiveData)); } catch { /* bad frame */ }
     });
     api.onAnalysis((text) => setClaudeAnalysis(text));
-    api.onAnalysing((v)   => setAnalysing(v));
+    api.onAnalysing((v) => setAnalysing(v));
+    api.onTriggerAnalysis(() => {
+      const { game, analysis } = useStore.getState();
+      if (!game || analysis?.isAnalysing) return;
+      api.requestAnalysis(buildPrompt(game));
+    });
   }, []);
 
   return (
@@ -32,9 +40,11 @@ export default function App() {
         <div className="flex-1 flex flex-col items-center justify-center gap-3 bg-lol-dark/90 rounded-b">
           <span className="text-4xl">⚔️</span>
           <p className="text-xs text-lol-dim">Waiting for a game to start…</p>
-          <p className="text-[10px] text-lol-dim/60">Launch League and enter a match.</p>
+          <p className="text-[10px] text-lol-dim/60">Launch League and enter a match or champ select.</p>
           <p className="text-[9px] text-lol-dim/40 mt-2">Ctrl+Shift+O to toggle overlay</p>
         </div>
+      ) : status === 'champ-select' ? (
+        <ChampSelectView />
       ) : (
         <>
           <TabNav />
@@ -43,6 +53,7 @@ export default function App() {
             {activeTab === 'teamfight' && <TeamfightTab />}
             {activeTab === 'items'     && <ItemsTab />}
             {activeTab === 'macro'     && <MacroTab />}
+            {activeTab === 'ai'        && <AiTab />}
           </div>
         </>
       )}

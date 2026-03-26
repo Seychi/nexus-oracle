@@ -94,6 +94,35 @@ function Recommendations() {
   );
 }
 
+function RecallPanel() {
+  const { analysis } = useStore();
+  if (!analysis?.recallAdvice) return null;
+  const { recallAdvice: r } = analysis;
+
+  return (
+    <div className={`rounded p-2 border ${r.shouldBack
+      ? 'bg-lol-green/10 border-lol-green/30'
+      : 'bg-lol-card border-white/[0.07]'}`}>
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[9px] font-bold text-lol-gold uppercase tracking-widest">Recall Advisor</span>
+        <span className="text-[11px] font-bold text-lol-gold">{r.gold}g</span>
+      </div>
+      <p className={`text-[10px] mb-1 ${r.shouldBack ? 'text-lol-green font-semibold' : 'text-lol-dim'}`}>
+        {r.reason}
+      </p>
+      {r.canAfford.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {r.canAfford.map((item, i) => (
+            <span key={i} className="text-[8px] bg-white/[0.05] border border-white/[0.08] text-lol-text px-1.5 py-0.5 rounded-full">
+              {item}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function EnemyItems() {
   const { game } = useStore();
   if (!game) return null;
@@ -123,6 +152,7 @@ function EnemyItems() {
 export default function ItemsTab() {
   return (
     <div className="flex flex-col gap-2 p-2 overflow-y-auto">
+      <RecallPanel />
       <AntihealPanel />
       <DamageChart />
       <Recommendations />

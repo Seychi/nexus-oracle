@@ -4,7 +4,7 @@ export type ChampClass   = 'Tank' | 'Fighter' | 'Assassin' | 'Mage' | 'Marksman'
 export type TeamArchetype= 'Engage' | 'Poke' | 'Protect-the-carry' | 'Splitpush' | 'Pick' | 'Teamfight' | 'Balanced';
 export type DamageType   = 'AD' | 'AP' | 'Mixed';
 export type AlertType    = 'danger' | 'warning' | 'info' | 'success';
-export type AlertCategory= 'antiheal' | 'item' | 'objective' | 'threat' | 'spell' | 'general';
+export type AlertCategory= 'antiheal' | 'item' | 'objective' | 'threat' | 'spell' | 'spike' | 'general';
 export type GamePhase    = 'early' | 'mid' | 'late';
 export type ThreatPriority = 'extreme' | 'high' | 'medium' | 'low';
 
@@ -80,6 +80,76 @@ export interface GameEvent {
   InhibKilled?: string;
   BaronKilled?: string;
   HeraldKilled?: string;
+  KillStreak?: number;
+}
+
+// ── Win prediction ───────────────────────────────────────────────────────────
+export interface WinFactor {
+  name: string; value: string; impact: 'positive' | 'negative' | 'neutral';
+}
+export interface WinPrediction {
+  probability: number;
+  factors: WinFactor[];
+}
+
+// ── Lane tracking ────────────────────────────────────────────────────────────
+export interface LaneState {
+  position: string;
+  ally: Player | null;
+  enemy: Player | null;
+  csDiff: number;
+  killDiff: number;
+  levelDiff: number;
+  state: 'winning' | 'losing' | 'even';
+}
+
+// ── Recall advisor ───────────────────────────────────────────────────────────
+export interface RecallAdvice {
+  gold: number;
+  canAfford: string[];
+  shouldBack: boolean;
+  reason: string;
+}
+
+// ── Buff status ──────────────────────────────────────────────────────────────
+export interface BuffStatus {
+  baronBuff: { remaining: number } | null;
+  elderBuff: { remaining: number } | null;
+}
+
+// ── Champ Select ─────────────────────────────────────────────────────────────
+export interface ChampSelectPlayer {
+  cellId: number;
+  championId: number;
+  championName: string;
+  assignedPosition: string;
+  spell1Id: number;
+  spell2Id: number;
+  team: number;
+  isLocalPlayer: boolean;
+  summonerId: number;
+}
+
+export interface PlayerProfile {
+  summonerId: number;
+  summonerName: string;
+  summonerLevel: number;
+  rank: string;       // e.g. "Gold II"
+  tier: string;       // e.g. "GOLD"
+  lp: number;
+  wins: number;
+  losses: number;
+  winRate: number;     // 0–100
+  topChampions: { name: string; mastery: number }[];
+}
+
+export interface ChampSelectState {
+  myTeam: ChampSelectPlayer[];
+  theirTeam: ChampSelectPlayer[];
+  phase: string;
+  timeLeft: number;
+  localPlayerChampion: string;
+  localPlayerPosition: string;
 }
 
 // ── Raw API shape ─────────────────────────────────────────────────────────────
@@ -174,7 +244,13 @@ export interface CompAnalysis {
 }
 
 export interface ObjectiveStatus {
-  dragon: { killCount: number; types: string[]; nextSpawnTime: number | null; isAlive: boolean };
+  dragon: {
+    killCount: number; types: string[]; nextSpawnTime: number | null; isAlive: boolean;
+    allySoulCount: number; enemySoulCount: number;
+    allyDrakeTypes: string[]; enemyDrakeTypes: string[];
+    allySoulType: string | null; enemySoulType: string | null;
+    enemyAtSoul: boolean;
+  };
   baron:  { killCount: number; nextSpawnTime: number | null; isAlive: boolean };
   herald: { killed: boolean; nextSpawnTime: number | null; isAlive: boolean };
 }
@@ -213,6 +289,10 @@ export interface GameAnalysis {
   gamePhase: GamePhase;
   itemRecommendations: ItemRecommendation[];
   splitPushAdvice: string | null;
+  winPrediction: WinPrediction;
+  laneStates: LaneState[];
+  recallAdvice: RecallAdvice | null;
+  buffs: BuffStatus;
   claudeAnalysis: string | null;
   isAnalysing: boolean;
 }

@@ -12,7 +12,24 @@
       "Bash(taskkill.exe /F /IM electron.exe /IM node.exe)",
       "Bash(node_modules/.bin/electron --enable-logging .vite/build/main.js)",
       "Bash(echo \"EXIT: $?\")",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(npx tsc:*)",
+      "Bash(docker:*)",
+      "Bash(npx prisma:*)",
+      "Bash(curl:*)",
+      "Bash(python3 -m json.tool)",
+      "Bash(netstat -ano)",
+      "Bash(npx tsx:*)",
+      "Bash(find C:nexus-oracleappsapi -name prisma -o -name .env*)",
+      "Bash(npm run:*)",
+      "Bash(node -e \":*)",
+      "Bash(nslookup:*)",
+      "Bash(for region:*)",
+      "Bash(do echo:*)",
+      "Bash(claude mcp:*)",
+      "Bash(ping -6 -n 1 db.xlexshtsrzmulnianead.supabase.co)",
+      "Bash(DATABASE_URL=\"postgresql://postgres.xlexshtsrzmulnianead:WRbZ33zPkz.MvU%2F@aws-1-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require\" npx prisma migrate deploy)",
+      "Bash(taskkill //F //IM node.exe)"
     ]
   }
 }
