@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+
+  html, body, #root {
+    height: 100%;
+    background: transparent;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: #dde0f0;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  ::-webkit-scrollbar       { width: 3px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+}
+
+/* Electron drag region */
+.drag { -webkit-app-region: drag; }
+.no-drag { -webkit-app-region: no-drag; }

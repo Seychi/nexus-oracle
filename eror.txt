@@ -1,0 +1,85 @@
+√ Checking your system
+√ Locating application
+√ Loading configuration
+√ Preparing native dependencies [0.8s]
+√ Running generateAssets hook
+√ Running preStart hook
+  √ [plugin-vite] Preparing Vite bundles
+    √ Launched Vite dev servers for renderer process code [0.6s]
+      √ Target main_window
+        › ➜  Local:   http://localhost:5173/
+        ➜  Network: use --host to expose
+    √ Built main process and preload bundles [1s]
+      √ Building electron/main.ts target
+      √ Building electron/preload.ts target
+√ Launched Electron app. Type rs in terminal to restart main process.
+
+04:59:13 [@electron-forge/plugin-vite] target built electron/main.ts
+04:59:13 [@electron-forge/plugin-vite] target built electron/preload.ts
+
+
+Error:   Failed to scan for dependencies from entries:
+  C:/Users/johns/OneDrive/Documents/TEST6WEBSITE/index.html
+
+  X [ERROR] Expected "}" but found "."
+
+    src/data/championClasses.ts:20:39:
+      20 │ ... 'Fighter', gwen: 'Fighter', dr.mundo: 'Fighter', drmundo: 'Fig...
+         │                                   ^
+         ╵                                   }
+
+
+    at failureErrorWithLog (C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:1472:15)
+    at C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:945:25
+    at runOnEndCallbacks (C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:1315:45)
+    at buildResponseToResult (C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:943:7)
+    at C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:955:9
+    at new Promise (<anonymous>)
+    at requestCallbacks.on-end (C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:954:54)
+    at handleRequest (C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:647:17)
+    at handleIncomingPacket (C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:672:7)
+    at Socket.readFromStdout (C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:600:7)
+    at Socket.emit (node:events:508:28)
+    at addChunk (node:internal/streams/readable:563:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)
+    at Readable.push (node:internal/streams/readable:394:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+[20204:0326/045915.360:ERROR:CONSOLE(1)] "Request Autofill.enable failed. {"code":-32601,"message":"'Autofill.enable' wasn't found"}", source: devtools://devtools/bundled/core/protocol_client/protocol_client.js (1)
+[20204:0326/045915.375:ERROR:CONSOLE(1)] "Request Autofill.setAddresses failed. {"code":-32601,"message":"'Autofill.setAddresses' wasn't found"}", source: devtools://devtools/bundled/core/protocol_client/protocol_client.js (1)
+04:59:15 [vite] Pre-transform error: Transform failed with 1 error:
+C:/Users/johns/OneDrive/Documents/TEST6WEBSITE/src/data/championClasses.ts:20:39: ERROR: Expected "}" but found "."
+04:59:15 [vite] Pre-transform error: Transform failed with 1 error:
+C:/Users/johns/OneDrive/Documents/TEST6WEBSITE/src/data/championClasses.ts:20:39: ERROR: Expected "}" but found "."
+04:59:15 [vite] Pre-transform error: Transform failed with 1 error:
+C:/Users/johns/OneDrive/Documents/TEST6WEBSITE/src/data/championClasses.ts:20:39: ERROR: Expected "}" but found "."
+04:59:15 [vite] Pre-transform error: Transform failed with 1 error:
+C:/Users/johns/OneDrive/Documents/TEST6WEBSITE/src/data/championClasses.ts:20:39: ERROR: Expected "}" but found "."
+04:59:15 [vite] Pre-transform error: Transform failed with 1 error:
+C:/Users/johns/OneDrive/Documents/TEST6WEBSITE/src/data/championClasses.ts:20:39: ERROR: Expected "}" but found "."
+04:59:15 [vite] Pre-transform error: Transform failed with 1 error:
+C:/Users/johns/OneDrive/Documents/TEST6WEBSITE/src/data/championClasses.ts:20:39: ERROR: Expected "}" but found "."
+04:59:15 [vite] Pre-transform error: Transform failed with 1 error:
+C:/Users/johns/OneDrive/Documents/TEST6WEBSITE/src/data/championClasses.ts:20:39: ERROR: Expected "}" but found "."
+04:59:15 [vite] Internal server error: Transform failed with 1 error:
+C:/Users/johns/OneDrive/Documents/TEST6WEBSITE/src/data/championClasses.ts:20:39: ERROR: Expected "}" but found "."
+  Plugin: vite:esbuild
+  File: C:/Users/johns/OneDrive/Documents/TEST6WEBSITE/src/data/championClasses.ts:20:39
+
+  Expected "}" but found "."
+  18 |    vi: 'Fighter', kled: 'Fighter', xinzhao: 'Fighter', jarvaniv: 'Fighter',
+  19 |    volibear: 'Fighter', hecarim: 'Fighter', pantheon: 'Fighter', poppy: 'Fighter',
+  20 |    jayce: 'Fighter', gwen: 'Fighter', dr.mundo: 'Fighter', drmundo: 'Fighter',
+     |                                         ^
+  21 |    mundo: 'Fighter', gangplank: 'Fighter', udyr: 'Fighter', skarner: 'Fighter',
+  22 |    monkeyking: 'Fighter', briar: 'Fighter', ambessa: 'Fighter',
+
+      at failureErrorWithLog (C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:1472:15)
+      at C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:755:50
+      at responseCallbacks.<computed> (C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:622:9)
+      at handleIncomingPacket (C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:677:12)
+      at Socket.readFromStdout (C:\Users\johns\OneDrive\Documents\TEST6WEBSITE\node_modules\esbuild\lib\main.js:600:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:563:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:514:3)
+      at Readable.push (node:internal/streams/readable:394:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)

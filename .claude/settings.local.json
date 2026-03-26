@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(export PATH=\"/c/Program Files/nodejs:$PATH\")",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(npm start:*)",
+      "Bash(tasklist.exe)",
+      "Bash(cd:*)",
+      "Bash(taskkill.exe /F /IM electron.exe)",
+      "Bash(taskkill.exe /F /IM electron.exe /IM node.exe)",
+      "Bash(node_modules/.bin/electron --enable-logging .vite/build/main.js)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(git:*)"
+    ]
+  }
+}
