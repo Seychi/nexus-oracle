@@ -29,7 +29,20 @@
       "Bash(claude mcp:*)",
       "Bash(ping -6 -n 1 db.xlexshtsrzmulnianead.supabase.co)",
       "Bash(DATABASE_URL=\"postgresql://postgres.xlexshtsrzmulnianead:WRbZ33zPkz.MvU%2F@aws-1-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require\" npx prisma migrate deploy)",
-      "Bash(taskkill //F //IM node.exe)"
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(npx vercel:*)",
+      "Bash(VITE_API_URL=https://nexus-oracle-bywo.onrender.com npx vercel --yes --prod)",
+      "mcp__MCP_DOCKER__browser_navigate",
+      "mcp__MCP_DOCKER__browser_take_screenshot",
+      "mcp__MCP_DOCKER__browser_snapshot",
+      "mcp__MCP_DOCKER__browser_click",
+      "mcp__MCP_DOCKER__browser_evaluate",
+      "mcp__MCP_DOCKER__browser_press_key",
+      "mcp__MCP_DOCKER__browser_wait_for"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
 }
