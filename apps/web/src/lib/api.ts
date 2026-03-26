@@ -48,13 +48,43 @@ export interface ChampionsResponse {
   champions: ChampionListItem[];
 }
 
-export function getChampions(params?: {
+export async function getChampions(params?: {
   role?: string;
   sort?: string;
   order?: string;
   patch?: string;
 }): Promise<ChampionsResponse> {
-  return fetchJSON(`${BASE}/champions`, { params });
+  // The API returns { data: ChampionStats[], cached: boolean }
+  // We need to map it to { patch, role, champions: ChampionListItem[] }
+  const raw = await fetchJSON<{ data?: any[]; champions?: ChampionListItem[]; cached?: boolean }>(
+    `${BASE}/champions`,
+    { params },
+  );
+
+  // If the API already returns the expected format, use it directly
+  if (raw.champions) return raw as ChampionsResponse;
+
+  // Map the API's { data: [...] } format to the frontend format
+  const rows = raw.data || [];
+  const champions: ChampionListItem[] = rows.map((s: any) => ({
+    championId: String(s.championId),
+    championName: s.championName || '',
+    role: s.role || '',
+    tier: s.tier || 'B',
+    winRate: s.winRate ?? 0,
+    pickRate: s.pickRate ?? 0,
+    banRate: s.banRate ?? 0,
+    avgKda:
+      s.avgKda ??
+      (s.avgDeaths ? (s.avgKills + s.avgAssists) / Math.max(s.avgDeaths, 1) : 0),
+    games: s.games ?? 0,
+  }));
+
+  return {
+    patch: params?.patch || '14.24',
+    role: params?.role || 'all',
+    champions,
+  };
 }
 
 /* ---------- Single Champion ---------- */
@@ -189,7 +219,9 @@ export interface RankInfo {
   lp: number;
   wins: number;
   losses: number;
+  winRate: number;
   queueType: string;
+  hotStreak?: boolean;
 }
 
 export interface SummonerProfile {
@@ -201,34 +233,76 @@ export interface SummonerProfile {
   ranks: RankInfo[];
 }
 
-export function getSummoner(
+export async function getSummoner(
   gameName: string,
   tagLine: string,
 ): Promise<SummonerProfile> {
-  return fetchJSON(
+  const raw = await fetchJSON<{ data: any }>(
     `${BASE}/summoner/by-name/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`,
   );
+
+  const d = raw.data || raw;
+
+  // Map rankedSolo/rankedFlex into a ranks array
+  const ranks: RankInfo[] = [];
+  if (d.rankedSolo) {
+    ranks.push({
+      tier: d.rankedSolo.tier,
+      division: d.rankedSolo.rank,
+      lp: d.rankedSolo.leaguePoints,
+      wins: d.rankedSolo.wins,
+      losses: d.rankedSolo.losses,
+      winRate: d.rankedSolo.winRate,
+      queueType: 'RANKED_SOLO_5x5',
+      hotStreak: d.rankedSolo.hotStreak,
+    });
+  }
+  if (d.rankedFlex) {
+    ranks.push({
+      tier: d.rankedFlex.tier,
+      division: d.rankedFlex.rank,
+      lp: d.rankedFlex.leaguePoints,
+      wins: d.rankedFlex.wins,
+      losses: d.rankedFlex.losses,
+      winRate: d.rankedFlex.winRate,
+      queueType: 'RANKED_FLEX_SR',
+    });
+  }
+
+  return {
+    puuid: d.puuid,
+    gameName: d.gameName,
+    tagLine: d.tagLine,
+    summonerLevel: d.summonerLevel,
+    profileIconId: d.profileIconId,
+    ranks,
+  };
 }
 
 /* ---------- Summoner Matches ---------- */
 
 export interface MatchParticipant {
-  championId: string;
+  puuid?: string;
+  summonerName?: string;
+  championId: number;
   championName: string;
+  teamPosition?: string;
+  teamId?: number;
   kills: number;
   deaths: number;
   assists: number;
-  cs: number;
-  items: number[];
   win: boolean;
+  items?: number[];
+  totalMinionsKilled?: number;
+  neutralMinionsKilled?: number;
 }
 
 export interface MatchEntry {
   matchId: string;
   gameMode: string;
   gameDuration: number;
-  champion: string;
-  championId: string;
+  championName: string;
+  championId: number;
   kills: number;
   deaths: number;
   assists: number;
@@ -237,37 +311,95 @@ export interface MatchEntry {
   win: boolean;
   role: string;
   gameCreation: number;
+  visionScore?: number;
+  totalDamageDealtToChampions?: number;
+  goldEarned?: number;
+  queueId?: number;
   participants?: MatchParticipant[];
 }
 
 export interface MatchesResponse {
-  puuid: string;
   matches: MatchEntry[];
+  total: number;
 }
 
-export function getSummonerMatches(puuid: string): Promise<MatchesResponse> {
-  return fetchJSON(`${BASE}/summoner/${puuid}/matches`);
+export async function getSummonerMatches(puuid: string): Promise<MatchesResponse> {
+  const raw = await fetchJSON<{ data: any[]; total?: number }>(
+    `${BASE}/summoner/${puuid}/matches`,
+  );
+
+  const rows = raw.data || [];
+  const matches: MatchEntry[] = rows.map((m: any) => ({
+    matchId: m.matchId,
+    gameMode: m.gameMode || 'CLASSIC',
+    gameDuration: m.gameDuration,
+    championName: m.championName,
+    championId: m.championId,
+    kills: m.kills,
+    deaths: m.deaths,
+    assists: m.assists,
+    cs: (m.totalMinionsKilled || 0) + (m.neutralMinionsKilled || 0),
+    items: m.items || [],
+    win: m.win,
+    role: m.teamPosition || '',
+    gameCreation: Number(m.gameStartTimestamp) || 0,
+    visionScore: m.visionScore,
+    totalDamageDealtToChampions: m.totalDamageDealtToChampions,
+    goldEarned: m.goldEarned,
+    queueId: m.queueId,
+    participants: m.participants,
+  }));
+
+  return { matches, total: raw.total || matches.length };
 }
 
 /* ---------- Summoner Stats ---------- */
 
 export interface ChampionStat {
-  championId: string;
+  championId: number;
   championName: string;
   games: number;
   wins: number;
   winRate: number;
-  avgKda: number;
-  avgCs: number;
 }
 
 export interface SummonerStatsResponse {
   puuid: string;
-  stats: ChampionStat[];
+  totalGames: number;
+  wins: number;
+  losses: number;
+  winRate: number;
+  avgKills: number;
+  avgDeaths: number;
+  avgAssists: number;
+  avgCs: number;
+  mostPlayedChampions: ChampionStat[];
 }
 
-export function getSummonerStats(
+export async function getSummonerStats(
   puuid: string,
 ): Promise<SummonerStatsResponse> {
-  return fetchJSON(`${BASE}/summoner/${puuid}/stats`);
+  const raw = await fetchJSON<{ data: any }>(
+    `${BASE}/summoner/${puuid}/stats`,
+  );
+
+  const d = raw.data || raw;
+  return {
+    puuid: d.puuid,
+    totalGames: d.totalGames || 0,
+    wins: d.wins || 0,
+    losses: d.losses || 0,
+    winRate: d.winRate || 0,
+    avgKills: d.avgKills || 0,
+    avgDeaths: d.avgDeaths || 0,
+    avgAssists: d.avgAssists || 0,
+    avgCs: d.avgCs || 0,
+    mostPlayedChampions: (d.mostPlayedChampions || []).map((c: any) => ({
+      championId: c.championId,
+      championName: c.championName,
+      games: c.games,
+      wins: c.wins,
+      winRate: c.winRate,
+    })),
+  };
 }

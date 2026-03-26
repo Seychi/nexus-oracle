@@ -5,13 +5,13 @@ const REGIONAL_BASE = process.env.RIOT_REGIONAL_BASE || 'https://americas.api.ri
 const PLATFORM_BASE = process.env.RIOT_PLATFORM_BASE || 'https://na1.api.riotgames.com';
 
 // Dev key limits: 20 req/s AND 100 req/2min
-// The 2-min limit is the binding constraint, so throttle to ~0.8 req/s
+// Allow reasonable concurrency while staying within limits
 const limiter = new Bottleneck({
-  reservoir: 100,
-  reservoirRefreshAmount: 100,
-  reservoirRefreshInterval: 120_000, // 100 per 2 minutes
-  maxConcurrent: 1,
-  minTime: 1250, // ~0.8 req/s to stay safe
+  reservoir: 80,
+  reservoirRefreshAmount: 80,
+  reservoirRefreshInterval: 120_000, // 80 per 2 minutes (headroom from 100)
+  maxConcurrent: 5,
+  minTime: 250, // ~4 req/s to stay well within 20/s
 });
 
 interface RiotApiError {
