@@ -91,6 +91,7 @@ export default function TierList() {
   const [sortKey, setSortKey] = useState<SortKey>('tier');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [usingFallback, setUsingFallback] = useState(false);
+  const [viewMode, setViewMode] = useState<'table' | 'tiers'>('table');
 
   const fetchData = useCallback(async (role: Role) => {
     setLoading(true);
@@ -226,6 +227,30 @@ export default function TierList() {
         ))}
       </div>
 
+      {/* View mode toggle */}
+      <div className="flex items-center gap-2 mb-4">
+        <button
+          onClick={() => setViewMode('table')}
+          className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+            viewMode === 'table'
+              ? 'bg-lol-gold/15 text-lol-gold border border-lol-gold/30'
+              : 'text-lol-dim hover:text-lol-text hover:bg-white/5 border border-transparent'
+          }`}
+        >
+          Table View
+        </button>
+        <button
+          onClick={() => setViewMode('tiers')}
+          className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+            viewMode === 'tiers'
+              ? 'bg-lol-gold/15 text-lol-gold border border-lol-gold/30'
+              : 'text-lol-dim hover:text-lol-text hover:bg-white/5 border border-transparent'
+          }`}
+        >
+          Tier Groups
+        </button>
+      </div>
+
       {/* Fallback notice */}
       {usingFallback && !loading && (
         <div className="mb-4 rounded-lg bg-lol-gold/5 border border-lol-gold/20 px-4 py-2.5 text-xs text-lol-gold">
@@ -257,8 +282,59 @@ export default function TierList() {
         </div>
       )}
 
+      {/* Tier Group View */}
+      {!loading && !error && sorted.length > 0 && viewMode === 'tiers' && (() => {
+        const tiers = ['S+', 'S', 'A', 'B', 'C'];
+        const tierColors: Record<string, { bg: string; border: string; text: string }> = {
+          'S+': { bg: 'bg-red-500/5', border: 'border-red-500/20', text: 'text-red-400' },
+          'S': { bg: 'bg-orange-500/5', border: 'border-orange-500/20', text: 'text-orange-400' },
+          'A': { bg: 'bg-blue-500/5', border: 'border-blue-500/20', text: 'text-blue-400' },
+          'B': { bg: 'bg-emerald-500/5', border: 'border-emerald-500/20', text: 'text-emerald-400' },
+          'C': { bg: 'bg-gray-500/5', border: 'border-gray-500/20', text: 'text-gray-400' },
+        };
+        return (
+          <div className="space-y-3">
+            {tiers.map((tier) => {
+              const tierChamps = sorted.filter((c) => (c.tier || 'B').toUpperCase() === tier);
+              if (tierChamps.length === 0) return null;
+              const tc = tierColors[tier];
+              return (
+                <div key={tier} className={`card ${tc.bg} border ${tc.border} overflow-hidden`}>
+                  <div className="flex items-stretch">
+                    <div className={`w-16 shrink-0 flex items-center justify-center ${tc.bg} border-r ${tc.border}`}>
+                      <span className={`text-2xl font-extrabold ${tc.text}`}>{tier}</span>
+                    </div>
+                    <div className="flex-1 p-3">
+                      <div className="flex flex-wrap gap-2">
+                        {tierChamps.map((champ) => (
+                          <button
+                            key={`${champ.championId}-${champ.role}`}
+                            onClick={() => navigate(`/champion/${champ._ddId || champ.championId}`)}
+                            className="flex items-center gap-2 bg-black/20 rounded-lg px-2.5 py-1.5 hover:bg-black/30 transition-colors group"
+                          >
+                            <DDImg
+                              src={getIconUrl(champ)}
+                              alt={champ.championName}
+                              className="w-7 h-7 rounded-md border border-white/10 group-hover:border-lol-gold/40 transition-colors"
+                            />
+                            <div className="text-left">
+                              <p className="text-xs font-semibold text-lol-text group-hover:text-lol-gold transition-colors leading-tight">{champ.championName}</p>
+                              <p className="text-[10px] text-lol-dim/50">{champ.winRate.toFixed(1)}%</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })()}
+
       {/* Table */}
-      {!loading && !error && sorted.length > 0 && (
+      {!loading && !error && sorted.length > 0 && viewMode === 'table' && (
         <div className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">

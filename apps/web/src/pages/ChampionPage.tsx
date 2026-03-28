@@ -13,6 +13,7 @@ import {
   fetchAllChampions,
   getChampionById,
   getChampionByKey,
+  resolveChampionIcon,
   DDImg,
   type DDChampion,
 } from '../lib/dataDragon';
@@ -20,7 +21,7 @@ import TierBadge from '../components/TierBadge';
 import BuildCard from '../components/BuildCard';
 import MatchupRow from '../components/MatchupRow';
 
-type Tab = 'overview' | 'builds' | 'matchups';
+type Tab = 'overview' | 'builds' | 'matchups' | 'counters';
 type MatchupSort = 'winRate' | 'games' | 'goldDiffAt15';
 
 interface ChampionData {
@@ -299,8 +300,11 @@ export default function ChampionPage() {
             <TabButton active={tab === 'builds'} onClick={() => setTab('builds')}>
               Builds
             </TabButton>
+            <TabButton active={tab === 'counters'} onClick={() => setTab('counters')}>
+              Counters
+            </TabButton>
             <TabButton active={tab === 'matchups'} onClick={() => setTab('matchups')}>
-              Matchups
+              All Matchups
             </TabButton>
           </div>
 
@@ -422,6 +426,94 @@ export default function ChampionPage() {
               {!builds.coreItems?.length && !builds.boots?.length && !builds.starterItems?.length && !builds.runes?.length && (
                 <div className="card p-8 text-center">
                   <p className="text-lol-dim">No build data available for this champion and role.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Counters Tab */}
+          {tab === 'counters' && (
+            <div>
+              {matchupsData.length > 0 ? (() => {
+                const sortedByWR = [...matchupsData].filter((m) => m.games >= 5).sort((a, b) => b.winRate - a.winRate);
+                const bestMatchups = sortedByWR.slice(0, 5);
+                const worstMatchups = sortedByWR.slice(-5).reverse();
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Best matchups (easiest) */}
+                    <div className="card-glow p-5">
+                      <h3 className="text-sm font-bold text-emerald-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                        Best Matchups
+                      </h3>
+                      <div className="space-y-3">
+                        {bestMatchups.map((m, idx) => {
+                          const ddChamp = getChampionByKey(m.opponentId);
+                          const iconUrl = ddChamp ? championIcon(ddChamp.id) : resolveChampionIcon(m.opponentName || m.opponentId);
+                          return (
+                            <div key={m.opponentId} className="flex items-center gap-3">
+                              <span className="text-xs text-lol-dim/40 w-4 text-right font-mono">{idx + 1}</span>
+                              <DDImg src={iconUrl} alt={m.opponentName || ''} className="w-9 h-9 rounded-lg border border-emerald-500/20" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-lol-text truncate">{m.opponentName || `Champion ${m.opponentId}`}</p>
+                                <p className="text-[10px] text-lol-dim/50">{m.games} games</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-bold text-emerald-400">{m.winRate.toFixed(1)}%</p>
+                                {m.goldDiffAt15 !== 0 && (
+                                  <p className={`text-[10px] ${m.goldDiffAt15 > 0 ? 'text-lol-gold/60' : 'text-red-400/60'}`}>
+                                    {m.goldDiffAt15 > 0 ? '+' : ''}{m.goldDiffAt15.toFixed(0)}g @15
+                                  </p>
+                                )}
+                              </div>
+                              <div className="w-14 h-2 bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-emerald-400/60 rounded-full" style={{ width: `${m.winRate}%` }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Worst matchups (hardest) */}
+                    <div className="card-glow p-5">
+                      <h3 className="text-sm font-bold text-red-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-red-400" />
+                        Worst Matchups
+                      </h3>
+                      <div className="space-y-3">
+                        {worstMatchups.map((m, idx) => {
+                          const ddChamp = getChampionByKey(m.opponentId);
+                          const iconUrl = ddChamp ? championIcon(ddChamp.id) : resolveChampionIcon(m.opponentName || m.opponentId);
+                          return (
+                            <div key={m.opponentId} className="flex items-center gap-3">
+                              <span className="text-xs text-lol-dim/40 w-4 text-right font-mono">{idx + 1}</span>
+                              <DDImg src={iconUrl} alt={m.opponentName || ''} className="w-9 h-9 rounded-lg border border-red-500/20" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-lol-text truncate">{m.opponentName || `Champion ${m.opponentId}`}</p>
+                                <p className="text-[10px] text-lol-dim/50">{m.games} games</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-bold text-red-400">{m.winRate.toFixed(1)}%</p>
+                                {m.goldDiffAt15 !== 0 && (
+                                  <p className={`text-[10px] ${m.goldDiffAt15 > 0 ? 'text-lol-gold/60' : 'text-red-400/60'}`}>
+                                    {m.goldDiffAt15 > 0 ? '+' : ''}{m.goldDiffAt15.toFixed(0)}g @15
+                                  </p>
+                                )}
+                              </div>
+                              <div className="w-14 h-2 bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-red-400/60 rounded-full" style={{ width: `${m.winRate}%` }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })() : (
+                <div className="card p-8 text-center">
+                  <p className="text-lol-dim">No matchup data available for this champion.</p>
                 </div>
               )}
             </div>

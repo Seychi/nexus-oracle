@@ -6,6 +6,9 @@ import championsRouter from './routes/champions.js';
 import buildsRouter from './routes/builds.js';
 import matchupsRouter from './routes/matchups.js';
 import summonerRouter from './routes/summoner.js';
+import matchesRouter from './routes/matches.js';
+import leaderboardsRouter from './routes/leaderboards.js';
+import statsRouter from './routes/stats.js';
 
 const app = express();
 const PORT = Number(process.env.PORT || 3001);
@@ -32,6 +35,9 @@ app.use('/api/champions', championsRouter);
 app.use('/api/builds', buildsRouter);
 app.use('/api/matchups', matchupsRouter);
 app.use('/api/summoner', summonerRouter);
+app.use('/api/matches', matchesRouter);
+app.use('/api/leaderboards', leaderboardsRouter);
+app.use('/api/stats', statsRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Not found' });

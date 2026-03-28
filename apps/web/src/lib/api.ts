@@ -353,6 +353,67 @@ export async function getSummonerMatches(puuid: string): Promise<MatchesResponse
   return { matches, total: raw.total || matches.length };
 }
 
+/* ---------- All Matches ---------- */
+
+export interface MatchTeamParticipant {
+  summonerName: string;
+  championId: number;
+  championName: string;
+  teamPosition: string;
+  win: boolean;
+  kills: number;
+  deaths: number;
+  assists: number;
+  totalDamageDealtToChampions: number;
+  goldEarned: number;
+  cs: number;
+  visionScore: number;
+  items: number[];
+  puuid?: string;
+  totalDamageTaken?: number;
+  wardsPlaced?: number;
+  wardsKilled?: number;
+  primaryRune?: number;
+  secondaryRune?: number;
+  summoner1Id?: number;
+  summoner2Id?: number;
+}
+
+export interface FullMatch {
+  matchId: string;
+  queueId: number;
+  patch: string;
+  gameDuration: number;
+  gameStartTimestamp: number;
+  blueTeam: MatchTeamParticipant[];
+  redTeam: MatchTeamParticipant[];
+  blueWin: boolean;
+}
+
+export interface FullMatchesResponse {
+  data: FullMatch[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export async function getMatches(params?: {
+  limit?: string;
+  offset?: string;
+  champion?: string;
+  role?: string;
+  queue?: string;
+  patch?: string;
+  sort?: string;
+}): Promise<FullMatchesResponse> {
+  return fetchJSON<FullMatchesResponse>(`${BASE}/matches`, { params });
+}
+
+export async function getMatchDetail(matchId: string): Promise<FullMatch> {
+  const raw = await fetchJSON<{ data: FullMatch }>(`${BASE}/matches/${matchId}`);
+  return raw.data;
+}
+
 /* ---------- Summoner Stats ---------- */
 
 export interface ChampionStat {
@@ -375,6 +436,157 @@ export interface SummonerStatsResponse {
   avgCs: number;
   mostPlayedChampions: ChampionStat[];
 }
+
+/* ---------- Leaderboards ---------- */
+
+export interface LeaderboardPlayer {
+  puuid: string;
+  summonerName: string;
+  games: number;
+  wins: number;
+  losses: number;
+  winRate: number;
+  avgKills: number;
+  avgDeaths: number;
+  avgAssists: number;
+  kda: number;
+  avgDamage: number;
+  avgGold: number;
+  avgVision: number;
+  avgCs: number;
+  totalKills: number;
+  totalDeaths: number;
+  totalAssists: number;
+}
+
+export interface LeaderboardResponse {
+  data: LeaderboardPlayer[];
+  total: number;
+  metric: string;
+}
+
+export async function getLeaderboard(params?: {
+  metric?: string;
+  role?: string;
+  patch?: string;
+  queue?: string;
+  limit?: string;
+  offset?: string;
+}): Promise<LeaderboardResponse> {
+  return fetchJSON<LeaderboardResponse>(`${BASE}/leaderboards`, { params });
+}
+
+/* ---------- Data Studio - Stats ---------- */
+
+export interface StatsOverview {
+  totalMatches: number;
+  totalParticipants: number;
+  uniquePlayers: number;
+  avgGameDuration: number;
+  winRate: number;
+  averages: {
+    kills: number;
+    deaths: number;
+    assists: number;
+    damage: number;
+    damageTaken: number;
+    gold: number;
+    cs: number;
+    vision: number;
+    wardsPlaced: number;
+    wardsKilled: number;
+    gameDuration: number;
+  };
+  totals: {
+    kills: number;
+    deaths: number;
+    assists: number;
+  };
+}
+
+export async function getStatsOverview(params?: {
+  patch?: string;
+  queue?: string;
+  role?: string;
+}): Promise<StatsOverview> {
+  const raw = await fetchJSON<{ data: StatsOverview }>(`${BASE}/stats/overview`, { params });
+  return raw.data;
+}
+
+export interface StudioChampionStat {
+  championId: number;
+  championName: string;
+  games: number;
+  wins: number;
+  winRate: number;
+  pickRate: number;
+  kda: number;
+  avgKills: number;
+  avgDeaths: number;
+  avgAssists: number;
+  avgDamage: number;
+  avgDamageTaken: number;
+  avgGold: number;
+  avgCs: number;
+  avgVision: number;
+  avgWardsPlaced: number;
+  avgWardsKilled: number;
+  totalKills: number;
+  totalDeaths: number;
+  totalAssists: number;
+  totalDamage: number;
+  totalGold: number;
+}
+
+export async function getStatsChampions(params?: {
+  role?: string;
+  patch?: string;
+  queue?: string;
+  sort?: string;
+  order?: string;
+}): Promise<{ data: StudioChampionStat[]; total: number }> {
+  return fetchJSON(`${BASE}/stats/champions`, { params });
+}
+
+export interface RoleStat {
+  role: string;
+  games: number;
+  wins: number;
+  winRate: number;
+  avgKills: number;
+  avgDeaths: number;
+  avgAssists: number;
+  avgDamage: number;
+  avgDamageTaken: number;
+  avgGold: number;
+  avgCs: number;
+  avgVision: number;
+}
+
+export async function getStatsRoles(params?: {
+  patch?: string;
+  queue?: string;
+}): Promise<{ data: RoleStat[] }> {
+  return fetchJSON(`${BASE}/stats/roles`, { params });
+}
+
+export interface ItemStat {
+  itemId: number;
+  games: number;
+  wins: number;
+  winRate: number;
+  pickRate: number;
+}
+
+export async function getStatsItems(params?: {
+  role?: string;
+  patch?: string;
+  queue?: string;
+}): Promise<{ data: ItemStat[]; totalGames: number }> {
+  return fetchJSON(`${BASE}/stats/items`, { params });
+}
+
+/* ---------- Summoner Stats ---------- */
 
 export async function getSummonerStats(
   puuid: string,

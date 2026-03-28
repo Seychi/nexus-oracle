@@ -8,6 +8,9 @@ import ChampionPage from './pages/ChampionPage';
 import SummonerPage from './pages/SummonerPage';
 import SummonerSearch from './pages/SummonerSearch';
 import ChampionGrid from './pages/ChampionGrid';
+import MatchesPage from './pages/MatchesPage';
+import LeaderboardsPage from './pages/LeaderboardsPage';
+import DataStudioPage from './pages/DataStudioPage';
 
 function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
   return (
@@ -57,6 +60,9 @@ export default function App() {
             <Route path="/tierlist" element={<TierList />} />
             <Route path="/champions" element={<ChampionGrid />} />
             <Route path="/champion/:championId" element={<ChampionPage />} />
+            <Route path="/matches" element={<MatchesPage />} />
+            <Route path="/leaderboards" element={<LeaderboardsPage />} />
+            <Route path="/data-studio" element={<DataStudioPage />} />
             <Route path="/summoner" element={<SummonerSearch />} />
             <Route path="/summoner/:gameName/:tagLine" element={<SummonerPage />} />
           </Routes>

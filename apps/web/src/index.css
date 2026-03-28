@@ -31,6 +31,12 @@
     scrollbar-width: thin;
     scrollbar-color: #2a3444 #0a0e14;
   }
+
+  /* Selection */
+  ::selection {
+    background: rgba(200, 170, 110, 0.25);
+    color: #e0ddd5;
+  }
 }
 
 @layer components {
@@ -43,6 +49,20 @@
     @apply bg-lol-card rounded-lg border border-white/5;
   }
 
+  .card-glow {
+    @apply bg-lol-card rounded-lg border border-white/5 relative overflow-hidden;
+  }
+
+  .card-glow::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200, 170, 110, 0.3), transparent);
+  }
+
   .stat-green {
     @apply text-emerald-400;
   }
@@ -53,5 +73,105 @@
 
   .stat-neutral {
     @apply text-lol-text;
+  }
+
+  /* Animated gradient border for featured cards */
+  .gradient-border {
+    position: relative;
+    background: #141a24;
+    border-radius: 0.75rem;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 0.75rem;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.3), transparent 50%, rgba(10, 200, 185, 0.2));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  /* Shimmer loading effect */
+  .shimmer {
+    background: linear-gradient(90deg, #141a24 0%, #1a2333 50%, #141a24 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Pulse glow for live indicators */
+  .pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Damage bar gradient */
+  .dmg-bar-physical {
+    background: linear-gradient(90deg, #e9422e, #ff6b4a);
+  }
+
+  .dmg-bar-magic {
+    background: linear-gradient(90deg, #2796bc, #4dc4e8);
+  }
+
+  .dmg-bar-true {
+    background: linear-gradient(90deg, #e0ddd5, #ffffff);
+  }
+
+  /* Win/loss stripe on match rows */
+  .win-stripe {
+    border-left: 3px solid #3cbc8d;
+  }
+
+  .loss-stripe {
+    border-left: 3px solid #e9422e;
+  }
+
+  /* Tooltip styling */
+  .recharts-tooltip-wrapper .recharts-default-tooltip {
+    background: #141a24 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
+  }
+
+  /* Table row hover highlight */
+  .table-hover-row:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  /* Rank badge styles */
+  .rank-badge {
+    @apply inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider;
+  }
+
+  .rank-1 {
+    background: linear-gradient(135deg, rgba(200, 170, 110, 0.2), rgba(200, 170, 110, 0.1));
+    color: #c8aa6e;
+    border: 1px solid rgba(200, 170, 110, 0.3);
+  }
+
+  .rank-2 {
+    background: rgba(192, 192, 192, 0.1);
+    color: #c0c0c0;
+    border: 1px solid rgba(192, 192, 192, 0.2);
+  }
+
+  .rank-3 {
+    background: rgba(205, 127, 50, 0.1);
+    color: #cd7f32;
+    border: 1px solid rgba(205, 127, 50, 0.2);
   }
 }
